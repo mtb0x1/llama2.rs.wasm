@@ -38,11 +38,12 @@ A dirty and minimal port of [@Gaxler](https://github.com/gaxler) [llama2.rs](htt
         - Place new files in `www` folder and edit `index.html` if needed
 
 ## Performance
-
+Temp : 0.9
+sequence length: 20
 Not really sure about result (yet!).
 |    tok/s   | 15M | 42M | 110M | 7B
 |-------|-----|-----|-----|-----|
-| Temp :0.9,sql_len:11 |  ?|   ~20   | ? | ?
+| wasm v1 |  ~40|   ~20   | ~7 | ?
 
 ### todo/Next ?
 - Display bench result in webpage instead of browser console
