@@ -2,11 +2,17 @@
 A dirty and minimal port of [@Gaxler](https://github.com/gaxler) [llama2.rs](https://github.com/gaxler/llama2.rs) 
 
 ## How to run?
-1. Download [@Karpathy](https://github.com/karpathy/)'s baby Llama2 ([Orig instructions](https://github.com/karpathy/llama2.c#feel-the-magic)) pretrained on TinyStories dataset and place them in `www` folder.
+1. clone repo
 ```bash
-    wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin
-    wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories42M.bin
-    wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M.bin
+    git clone https://github.com/chesal/llama2.rs.wasm
+    cd llama2.rs.wasm
+```
+
+2. Download [@Karpathy](https://github.com/karpathy/)'s baby Llama2 ([Orig instructions](https://github.com/karpathy/llama2.c#feel-the-magic)) pretrained on TinyStories dataset and place them in `www` folder.
+```bash
+    wget -P www/ https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin
+    wget -P www/ https://huggingface.co/karpathy/tinyllamas/resolve/main/stories42M.bin
+    wget -P www/ https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M.bin
 ```
 > stories42M is used by default (for now @todo), you can change this in `index.html`
 
@@ -14,10 +20,10 @@ A dirty and minimal port of [@Gaxler](https://github.com/gaxler) [llama2.rs](htt
     ```bash 
     wasm-pack build --release --target web --out-dir www/pkg/
     ```
-4. Run a minimal webserver with `www``folder : 
+4. Run a minimal webserver with `www` folder : 
     1. Run (requires python 3), you can use other webservers if you want
     ```bash
-    python3 -m http.server 8080
+    cd www && python3 -m http.server 8080
     ```
     2. go to http://localhost:8080/
     3. open browser console (@todo)
