@@ -7,7 +7,7 @@ use rand::{Rng, SeedableRng};
 use std::io::{self, Write};
 
 use rayon_wasm::current_num_threads;
-use rayon_wasm::ThreadPoolBuilder;
+//use rayon_wasm::ThreadPoolBuilder;
 use rayon_wasm::iter::IndexedParallelIterator;
 use rayon_wasm::iter::IntoParallelIterator;
 use rayon_wasm::iter::IntoParallelRefMutIterator;
@@ -236,7 +236,7 @@ fn matmul(out: &mut [Ty], x: &[Ty], w: &[Ty], in_dim: usize) {
             .fold(0 as Ty, |acc, (&_w, &_x)| acc + _w * _x);
     });
 }
-
+#[allow(clippy::mut_from_ref)]
 fn _uncheked_mut_slice(s: &[Ty], offset: usize, size: usize) -> &mut [Ty] {
     let ptr = s.as_ptr() as *mut Ty;
     unsafe {
@@ -277,7 +277,7 @@ fn cdf_sample(probs: &[Ty]) -> usize {
     }
     probs.len() - 1
 }
-
+#[allow(clippy::too_many_arguments)]
 fn _att_head_impl(
     layer: usize,
     h: usize,
@@ -360,7 +360,7 @@ impl RunState {
         matmul(&mut self.k, &self.xb, wk, dim);
         matmul(&mut self.v, &self.xb, wv, dim);
     }
-
+    #[allow(clippy::unnecessary_mut_passed)]
     fn cache_kv(&mut self, pos: usize, layer: usize, cfg: &Config) {
         let offset = layer * cfg.dim * cfg.seq_len + pos * cfg.dim;
         let kc = _uncheked_mut_slice(&mut self.key_cache, offset, cfg.dim);
@@ -543,13 +543,13 @@ pub fn main_wasm(
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
 
     let cpus = web_sys::window()
-    .expect("no global `window` exists")
-    .navigator()
-    .hardware_concurrency() as usize;
+        .expect("no global `window` exists")
+        .navigator()
+        .hardware_concurrency() as usize;
     log::info!("--> [available 'CPUs' = {}]\n\n", cpus);
-    
-    //@todo ... 
-    //value: ThreadPoolBuildError 
+
+    //@todo ...
+    //value: ThreadPoolBuildError
     //{ kind: IOError(Error { kind: Unsupported, message: "operation not supported on this platform" }) }
 
     /*let cpus_in_use = (cpus as f64*0.75) as usize;
@@ -557,20 +557,15 @@ pub fn main_wasm(
     .num_threads(cpus_in_use)
     .build_global()
     .unwrap();*/
-    
+
     let active_cpus = current_num_threads();
     log::info!("--> [Running Inference on {} 'CPUs']\n\n", active_cpus);
 
-
     let mut model_buffer: Vec<u8> = model_buffer;
-    let mut tokenizer_buffer: Vec<u8> = tokenizer_buffer; 
+    let mut tokenizer_buffer: Vec<u8> = tokenizer_buffer;
 
     let config = Config::from_file(&mut model_buffer);
     log::info!("Config loaded");
-
-
-
-    
 
     let vocab = Vocab::from_file(config.vocab_size, &mut tokenizer_buffer);
     log::info!("Vocab loaded");
