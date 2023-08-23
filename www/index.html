@@ -17,6 +17,7 @@
         }
     </style>
     <head>
+        <!-- preload loads 438m+167m+60m+size_of(llama2_rs_wasm_bg.wasm) ... after few refresh browser memory goes up fast -->
         <link rel="preload" href="/pkg/llama2_rs_wasm_bg.wasm" as="fetch" type="application/wasm" crossorigin="" />
         <link rel="preload" href="/stories42M.bin" as="fetch" type="application/binary" crossorigin="" />
         <link rel="preload" href="/stories15M.bin" as="fetch" type="application/binary" crossorigin="" />
@@ -34,8 +35,8 @@
                 <option value="stories110M">stories110m</option>
             </select>
 
-            <label>temperature</label><input id="temperature" type="number" value="0.9" /> <label>steps</label><input id="steps" type="number" value="100" />
-            <button id="run" onclick="run();">run</button>
+            <label>temperature</label><input id="temperature" type="number" value="0.9" /> <label>Sequence length</label><input id="seq_len" type="number" value="20" />
+            <button id="run">run</button>
         </div>
         <textarea id="output" rows="20" cols="80"></textarea>
         <p><span>achieved tok/s: </span><span id="toks"></span></p>
@@ -52,7 +53,8 @@
   
         async function run() {
             await init();
-            const model_buffer =await fetch('stories42M.bin')
+            let model = document.getElementById("model").value+".bin";
+            const model_buffer =await fetch(model)
             .then(response => response.arrayBuffer())
             .then(buffer => {
                 // Convert the ArrayBuffer to a Uint8Array
@@ -68,10 +70,17 @@
             });
             console.info("JS: tokenizer_buffer fetched");
 
-            main_wasm(model_buffer,tokenizer_buffer,0.9,20,"The only thing");
+            let temperature  = document.getElementById("temperature").value;
+            let sequence_length = document.getElementById("seq_len").value;
+            //debugger;
+
+            main_wasm(model_buffer,tokenizer_buffer,temperature,sequence_length,/*unused*/"The only thing");
+            //main_wasm(model_buffer,tokenizer_buffer,0.9,20,/*unused*/"The only thing");
         }
   
         run();
+        document.getElementById('run').addEventListener('click', run);
+
       </script>
     </body>
 </html>

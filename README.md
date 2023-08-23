@@ -53,8 +53,8 @@ wget -P www/ https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M
 
 ### todo/Next ?
 - Display bench result in webpage instead of browser console
-- Infrence based on user inputs
-- Optmization : simd, rayon ... etc
+- Infrence based on user inputs (wip)
+- Optmization : simd, rayon (wip) ... etc
 
 ## License
 MIT
