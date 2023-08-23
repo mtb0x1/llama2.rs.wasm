@@ -9,7 +9,7 @@ A dirty and minimal port of [@Gaxler](https://github.com/gaxler) [llama2.rs](htt
 ## How to run?
 1. Clone repo
 ```bash
-git clone https://github.com/chesal/llama2.rs.wasm
+git clone https://github.com/mtb0x1/llama2.rs.wasm
 cd llama2.rs.wasm
 ```
 
