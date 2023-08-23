@@ -39,7 +39,7 @@ wget -P www/ https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M
         ```
     2. Changing the frontend `index.html`
     3. Changing model/tokenizer :
-        - Follow [@Karpathy](https://github.com/karpathy/)'s instruction in [llama2.c](https://github.com/karpathy/llama2.c)
+        - Follow [@Karpathy](https://github.com/karpathy/)'s instructions in [llama2.c](https://github.com/karpathy/llama2.c)
         - Place new files in `www` folder and edit `index.html` if needed
 
 ## Performance
