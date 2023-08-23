@@ -21,7 +21,7 @@ A dirty and minimal port of [@Gaxler](https://github.com/gaxler) [llama2.rs](htt
     ```
     2. go to http://localhost:8080/
     3. open browser console (@todo)
-5. (Optionnal) if you want to make changes :(reload browser/clear cache after changes)
+5. (Optional) if you want to make changes :(reload browser/clear cache after changes)
     1. Changing `lib.rs` content :
         ```bash
         wasm-pack build --release --target web --out-dir www/pkg/
