@@ -48,7 +48,7 @@ wget -P www/ https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M
 
 |    tok/s   | 15M | 42M | 110M | 7B
 |-------|-----|-----|-----|-----|
-| wasm v1 |  ~40|   ~20   | ~7 | ?
+| wasm v1 |  ~50|   ~20   | ~7 | ?
 > Not really sure about result (yet!).
 
 ### todo/Next ?
