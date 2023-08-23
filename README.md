@@ -2,7 +2,7 @@
 A dirty and minimal port of [@Gaxler](https://github.com/gaxler) [llama2.rs](https://github.com/gaxler/llama2.rs) 
 
 <p align="center">
-  <img src="assets/llama_cute.jpg" width="300" height="300" alt="Cute Llama">
+  <img src="assets/llama_notcute.jpg" width="300" height="300" alt="Cute Llama">
 </p>
 
 
