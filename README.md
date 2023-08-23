@@ -38,13 +38,12 @@ wget -P www/ https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M
         - Place new files in `www` folder and edit `index.html` if needed
 
 ## Performance
-Temp : 0.9
-sequence length: 20
-Not really sure about result (yet!).
+- Temp : 0.9
+- sequence length: 20
 |    tok/s   | 15M | 42M | 110M | 7B
 |-------|-----|-----|-----|-----|
 | wasm v1 |  ~40|   ~20   | ~7 | ?
-
+> Not really sure about result (yet!).
 ### todo/Next ?
 - Display bench result in webpage instead of browser console
 - Infrence based on user inputs
