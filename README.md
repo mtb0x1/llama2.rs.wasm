@@ -21,7 +21,7 @@ wget -P www/ https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M
 ```
 > stories42M is used by default (for now @todo), you can change this in `index.html`
 
-3. Run (requires (wasm-pack)[https://github.com/rustwasm/wasm-pack]) 
+3. Run (requires [wasm-pack](https://github.com/rustwasm/wasm-pack)) 
     ```bash 
     wasm-pack build --release --target web --out-dir www/pkg/
     ```
@@ -39,7 +39,7 @@ wget -P www/ https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M
         ```
     2. Changing the frontend `index.html`
     3. Changing model/tokenizer :
-        - Follow instruction in [@Karpathy](https://github.com/karpathy/) in [llama2.c](https://github.com/karpathy/llama2.c)
+        - Follow [@Karpathy](https://github.com/karpathy/)'s instruction in [llama2.c](https://github.com/karpathy/llama2.c)
         - Place new files in `www` folder and edit `index.html` if needed
 
 ## Performance
@@ -48,7 +48,7 @@ wget -P www/ https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M
 
 |    tok/s   | 15M | 42M | 110M | 7B
 |-------|-----|-----|-----|-----|
-| wasm v1 |  ~40|   ~20   | ~7 | ?
+| wasm v1 |  ~50|   ~20   | ~7 | ?
 > Not really sure about result (yet!).
 
 ### todo/Next ?

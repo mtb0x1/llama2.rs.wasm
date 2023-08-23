@@ -132,10 +132,8 @@ dependencies = [
  "console_log",
  "getrandom",
  "log",
- "num_cpus",
  "rand",
- "rayon",
- "true",
+ "rayon-wasm",
  "wasm-bindgen",
  "web-sys",
 ]
@@ -226,25 +224,25 @@ dependencies = [
 ]
 
 [[package]]
-name = "rayon"
-version = "1.7.0"
+name = "rayon-core-wasm"
+version = "1.10.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d2df5196e37bcc87abebc0053e20787d73847bb33134a69841207dd0a47f03b"
-dependencies = [
- "either",
- "rayon-core",
-]
-
-[[package]]
-name = "rayon-core"
-version = "1.11.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4b8f95bd6966f5c87776639160a66bd8ab9895d9d4ab01ddba9fc60661aebe8d"
+checksum = "1760cc4f465e594a925a04de9acd1df83fb76cc1dea3cdb5f7131d79bb09d871"
 dependencies = [
  "crossbeam-channel",
  "crossbeam-deque",
  "crossbeam-utils",
  "num_cpus",
+]
+
+[[package]]
+name = "rayon-wasm"
+version = "1.6.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bef9a7616186f65123ac92441fe683b45f738cc0a1125acdf6f76898213c4a43"
+dependencies = [
+ "either",
+ "rayon-core-wasm",
 ]
 
 [[package]]
@@ -263,12 +261,6 @@ dependencies = [
  "quote",
  "unicode-ident",
 ]
-
-[[package]]
-name = "true"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "548ec159e98411c04bee9b458df4ccd2da2a0a5e50c08cbd7e90b00b154c5a9a"
 
 [[package]]
 name = "unicode-ident"

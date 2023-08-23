@@ -6,8 +6,12 @@ use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
 use std::io::{self, Write};
 
-#[cfg(feature = "parallel")]
-use rayon::prelude::*;
+use rayon_wasm::current_num_threads;
+use rayon_wasm::ThreadPoolBuilder;
+use rayon_wasm::iter::IndexedParallelIterator;
+use rayon_wasm::iter::IntoParallelIterator;
+use rayon_wasm::iter::IntoParallelRefMutIterator;
+use rayon_wasm::iter::ParallelIterator;
 
 const CONF_VALS: usize = 7;
 const CONF_SIZE: usize = std::mem::size_of::<[i32; CONF_VALS]>();
@@ -224,7 +228,6 @@ fn rmsnorm(out: &mut [Ty], x: &[Ty], w: &[Ty]) {
 
 /// For now this is a matvec
 /// Wx: [n, d]x[d,] -> [n,]
-#[cfg(feature = "parallel")]
 fn matmul(out: &mut [Ty], x: &[Ty], w: &[Ty], in_dim: usize) {
     out.par_iter_mut().enumerate().for_each(|(i, out_val)| {
         *out_val = _uncheked_slice(w, i * in_dim, in_dim)
@@ -232,17 +235,6 @@ fn matmul(out: &mut [Ty], x: &[Ty], w: &[Ty], in_dim: usize) {
             .zip(x.iter())
             .fold(0 as Ty, |acc, (&_w, &_x)| acc + _w * _x);
     });
-}
-
-#[cfg(not(feature = "parallel"))]
-fn matmul(out: &mut [Ty], x: &[Ty], w: &[Ty], in_dim: usize) {
-    for (row, out_elem) in w.chunks_exact(in_dim).zip(out.iter_mut()) {
-        let val = row
-            .iter()
-            .zip(x.iter())
-            .fold(0 as Ty, |acc, (&_w, &_x)| acc + _w * _x);
-        *out_elem = val;
-    }
 }
 
 fn _uncheked_mut_slice(s: &[Ty], offset: usize, size: usize) -> &mut [Ty] {
@@ -448,11 +440,7 @@ impl RunState {
             )
         };
 
-        #[cfg(feature = "parallel")]
         (0..cfg.n_heads).into_par_iter().for_each(attn_lambda);
-
-        #[cfg(not(feature = "parallel"))]
-        (0..cfg.n_heads).for_each(attn_lambda);
     }
 
     fn ffn(&mut self, l: usize, w: &TransformerWeights<Ty>, cfg: &Config) {
@@ -550,28 +538,39 @@ pub fn main_wasm(
     temperature: f32,
     seq_len: usize,
 ) {
-    let mut model_buffer: Vec<u8> = model_buffer;
-    let mut tokenizer_buffer: Vec<u8> = tokenizer_buffer;
-
+    log::info!("Starting inference");
     let _ = console_log::init_with_level(log::Level::Trace);
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
-    log::info!("Starting inference");
+
+    let cpus = web_sys::window()
+    .expect("no global `window` exists")
+    .navigator()
+    .hardware_concurrency() as usize;
+    log::info!("--> [available 'CPUs' = {}]\n\n", cpus);
+    
+    //@todo ... 
+    //value: ThreadPoolBuildError 
+    //{ kind: IOError(Error { kind: Unsupported, message: "operation not supported on this platform" }) }
+
+    /*let cpus_in_use = (cpus as f64*0.75) as usize;
+    ThreadPoolBuilder::new()
+    .num_threads(cpus_in_use)
+    .build_global()
+    .unwrap();*/
+    
+    let active_cpus = current_num_threads();
+    log::info!("--> [Running Inference on {} 'CPUs']\n\n", active_cpus);
+
+
+    let mut model_buffer: Vec<u8> = model_buffer;
+    let mut tokenizer_buffer: Vec<u8> = tokenizer_buffer; 
 
     let config = Config::from_file(&mut model_buffer);
     log::info!("Config loaded");
 
-    #[cfg(feature = "parallel")]
-    {
-        use num_cpus;
-        let cpus = num_cpus::get();
-        let active_cpus = (cpus).max(1).min(config.n_heads); // use 75% of available cores
-        log::info!("--> [Running Inference on {} CPUs]\n\n", active_cpus);
 
-        rayon::ThreadPoolBuilder::new()
-            .num_threads(active_cpus)
-            .build_global()
-            .unwrap();
-    }
+
+    
 
     let vocab = Vocab::from_file(config.vocab_size, &mut tokenizer_buffer);
     log::info!("Vocab loaded");
