@@ -2,7 +2,7 @@
 A dirty and minimal port of [@Gaxler](https://github.com/gaxler) [llama2.rs](https://github.com/gaxler/llama2.rs) 
 
 ## How to run?
-1. Download [@Karpathy](https://github.com/karpathy/)'s baby Llama2 (Orig instructions) pretrained on TinyStories dataset and place them in `www` folder.
+1. Download [@Karpathy](https://github.com/karpathy/)'s baby Llama2 ([Orig instructions](https://github.com/karpathy/llama2.c#feel-the-magic)) pretrained on TinyStories dataset and place them in `www` folder.
 ```bash
     wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin
     wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories42M.bin
