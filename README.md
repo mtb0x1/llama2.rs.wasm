@@ -1,14 +1,14 @@
 ## llama2.rs.wasm 🦀
-A dirty and minimal port of @gaxler [llama2.rs](https://github.com/gaxler/llama2.rs) 
+A dirty and minimal port of [@Gaxler](https://github.com/gaxler) [llama2.rs](https://github.com/gaxler/llama2.rs) 
 
 ## How to run?
-1. Download Karpathy's baby Llama2 (Orig instructions) pretrained on TinyStories dataset and place them in `www` folder.
+1. Download [@Karpathy](https://github.com/karpathy/)'s baby Llama2 (Orig instructions) pretrained on TinyStories dataset and place them in `www` folder.
 ```bash
     wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin
     wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories42M.bin
     wget https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M.bin
 ```
-> stories42M is used by (for now @todo), you can change this in `index.html`
+> stories42M is used by default (for now @todo), you can change this in `index.html`
 
 3. Run (requires (wasm-pack)[https://github.com/rustwasm/wasm-pack]) 
     ```bash 
@@ -28,7 +28,7 @@ A dirty and minimal port of @gaxler [llama2.rs](https://github.com/gaxler/llama2
         ```
     2. Changing the frontend `index.html`
     3. Changing model/tokenizer :
-        - Follow instruction in @karpathy in [llama2.c](https://github.com/karpathy/llama2.c)
+        - Follow instruction in [@Karpathy](https://github.com/karpathy/) in [llama2.c](https://github.com/karpathy/llama2.c)
         - Place new files in `www` folder and edit `index.html` if needed
 
 ## Performance
