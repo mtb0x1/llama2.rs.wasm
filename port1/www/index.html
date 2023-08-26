@@ -1,0 +1,94 @@
+<html>
+    <meta charset="utf-8" />
+    <title>port1</title>
+    <style>
+        body {
+            padding: 1em;
+        }
+        label,
+        button {
+            margin: 0.5em;
+        }
+        input {
+            width: 5em;
+        }
+        textarea {
+            padding: 1em;
+        }
+    </style>
+    <head>
+        <!-- preload loads 438m+167m+60m+size_of(port1_bg.wasm) ... after few refresh browser memory goes up fast -->
+        <link rel="preload" href="/pkg/port1_bg.wasm" as="fetch" type="application/wasm" crossorigin="" />
+        <link rel="preload" href="/stories42M.bin" as="fetch" type="application/binary" crossorigin="" />
+        <link rel="preload" href="/stories15M.bin" as="fetch" type="application/binary" crossorigin="" />
+        <link rel="preload" href="/stories110M.bin" as="fetch" type="application/binary" crossorigin="" />
+        <link rel="module" href="/pkg/port1_bg.js" as="fetch" type="application/javascript" crossorigin="" /> 
+        <script>
+            var backup_info = window.console.info;
+            function new_info(msg,...args){
+                //debugger;
+                backup_info(msg,...args);
+                document.getElementById("output").value = 
+                document.getElementById("output").value +"\n"+ msg;
+            }
+            window.console.info = new_info;
+        </script>      
+    </head>
+    <body>
+        <div>
+            <div>
+                <textarea id="prompt" type="text" value="" cols="80" rows="1" placeholder="not supported with this port" disabled></textarea>
+            </div>
+            <select id="model">
+                <option value="stories15M">stories15m</option>
+                <option selected="selected" value="stories42M">stories42m</option>
+                <option value="stories110M">stories110m</option>
+            </select>
+
+            <label>temperature</label><input id="temperature" type="number" value="0.9" /> <label>Sequence length</label><input id="seq_len" type="number" value="20" />
+            <button id="run">run</button>
+        </div>
+        <textarea id="output" rows="20" cols="80"></textarea>
+    <!--    <p><span>achieved tok/s: </span><span id="toks"></span></p> -->
+    <!-- Note the usage of `type=module` here as this is an ES6 module -->
+    <script type="module">
+        // Use ES module import syntax to import functionality from the module
+        // that we have compiled.
+        //
+        // Note that the `default` import is an initialization function which
+        // will "boot" the module and make it ready to use. Currently browsers
+        // don't support natively imported WebAssembly as an ES module, but
+        // eventually the manual initialization won't be required!
+        import init, { main_wasm } from './pkg/port1.js';
+  
+        async function run() {
+            document.getElementById("output").value ="";
+            await init();
+            let model = document.getElementById("model").value+".bin";
+            const model_buffer =await fetch(model)
+            .then(response => response.arrayBuffer())
+            .then(buffer => {
+                // Convert the ArrayBuffer to a Uint8Array
+                return new Uint8Array(buffer);
+            });
+            console.info("JS: model_buffer fetched");
+
+            const tokenizer_buffer =await fetch('tokenizer.bin')
+            .then(response => response.arrayBuffer())
+            .then(buffer => {
+                // Convert the ArrayBuffer to a Uint8Array
+                return new Uint8Array(buffer);
+            });
+            console.info("JS: tokenizer_buffer fetched");
+            
+            let temperature  = document.getElementById("temperature").value;
+            let sequence_length = document.getElementById("seq_len").value;
+            main_wasm(model_buffer,tokenizer_buffer,temperature,sequence_length,/*unused*/"The only thing");
+        }
+  
+        run();
+        document.getElementById('run').addEventListener('click', run);
+
+      </script>
+    </body>
+</html>

@@ -127,16 +127,6 @@ checksum = "b4668fb0ea861c1df094127ac5f1da3409a82116a4ba74fca2e58ef927159bb3"
 [[package]]
 name = "llama2-rs-wasm"
 version = "0.1.0"
-dependencies = [
- "console_error_panic_hook",
- "console_log",
- "getrandom",
- "log",
- "rand",
- "rayon-wasm",
- "wasm-bindgen",
- "web-sys",
-]
 
 [[package]]
 name = "log"
@@ -168,6 +158,20 @@ name = "once_cell"
 version = "1.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dd8b5dd2ae5ed71462c540258bedcb51965123ad7e7ccf4b9a8cafaa4a63576d"
+
+[[package]]
+name = "port1"
+version = "0.1.0"
+dependencies = [
+ "console_error_panic_hook",
+ "console_log",
+ "getrandom",
+ "log",
+ "rand",
+ "rayon-wasm",
+ "wasm-bindgen",
+ "web-sys",
+]
 
 [[package]]
 name = "ppv-lite86"

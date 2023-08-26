@@ -1,0 +1,37 @@
+[package]
+name = "port1"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rand = { version = "0.8.5", features = ["small_rng"] }
+rayon-wasm = "1.6.2" #no point if we don't higher throughput
+
+ 
+
+wasm-bindgen = "0.2"
+web-sys = {version="0.3.64",features=["Window","Performance","Navigator"]}
+console_log = {version="1.0.0",features=["color","wasm-bindgen"]}
+console_error_panic_hook = "0.1.7"
+log = "0.4.19"
+
+
+[dependencies.getrandom]
+version = "0.2.10"
+features = ["js"]
+
+
+
+[profile.release]
+panic = "abort"
+
+
+[lib]
+crate-type = [
+    "cdylib",
+    "rlib",
+]
+
+
