@@ -1,5 +1,0 @@
-[build]
-target = "wasm32-unknown-unknown"
-
-[target.wasm32-unknown-unknown]
-rustflags = ["-C","opt-level=3","-C", "target-feature=+relaxed-simd,+simd128"]
