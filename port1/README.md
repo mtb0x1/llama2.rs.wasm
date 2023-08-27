@@ -10,7 +10,7 @@ A dirty and minimal port of [@Gaxler](https://github.com/gaxler) [llama2.rs](htt
 1. Clone repo
 ```bash
 git clone https://github.com/mtb0x1/llama2.rs.wasm
-cd llama2.rs.wasm
+cd llama2.rs.wasm/port1/
 ```
 
 2. Download [@Karpathy](https://github.com/karpathy/)'s baby Llama2 ([Orig instructions](https://github.com/karpathy/llama2.c#feel-the-magic)) pretrained on TinyStories dataset and place them in `www` folder.
