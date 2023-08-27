@@ -1,6 +1,5 @@
 
-# A first-level heading
-rework in progress ...
+# rework in progress ...
 I will try to port few llama2.rs to wasm, each will be in a ./portX folder with specific instructions.
 
 ## Check instructions 
