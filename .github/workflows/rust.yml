@@ -19,5 +19,5 @@ jobs:
     - name: install wasm-pack
       run: cargo install wasm-pack
     - name: Build
-      run:  wasm-pack build --release --target web --out-dir www/pkg/
+      run:  ./build.sh #wasm-pack build --release --target web --out-dir www/pkg/
 
