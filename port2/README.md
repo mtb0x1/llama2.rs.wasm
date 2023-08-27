@@ -1,5 +1,5 @@
 ## llama2.rs.wasm 🦀
-A dirty and minimal port of [@Gaxler](https://github.com/gaxler) [llama2.rs](https://github.com/gaxler/llama2.rs) 
+A dirty and minimal port of [@leo-du](https://github.com/leo-du) [llama2.rs](https://github.com/leo-du/llama2.rs) 
 
 <p align="center">
   <img src="assets/llama_notcute.jpg" width="300" height="300" alt="Cute Llama">
@@ -48,7 +48,7 @@ wget -P www/ https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M
 
 |    tok/s   | 15M | 42M | 110M | 7B
 |-------|-----|-----|-----|-----|
-| wasm v1 |  ~50|   ~20   | ~7 | ?
+| wasm v1 |  ?|   ?   | ? | ?
 > Not really sure about result (yet!).
 
 ### todo/Next ?

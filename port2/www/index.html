@@ -1,6 +1,6 @@
 <html>
     <meta charset="utf-8" />
-    <title>port1</title>
+    <title>port2</title>
     <style>
         body {
             padding: 1em;
@@ -17,27 +17,27 @@
         }
     </style>
     <head>
-        <!-- preload loads 438m+167m+60m+size_of(port1_bg.wasm) ... after few refresh browser memory goes up fast -->
-        <link rel="preload" href="/pkg/port1_bg.wasm" as="fetch" type="application/wasm" crossorigin="" />
+        <!-- preload loads 438m+167m+60m+size_of(port2_bg.wasm) ... after few refresh browser memory goes up fast -->
+        <link rel="preload" href="/pkg/port2_bg.wasm" as="fetch" type="application/wasm" crossorigin="" />
         <link rel="preload" href="/stories42M.bin" as="fetch" type="application/binary" crossorigin="" />
         <link rel="preload" href="/stories15M.bin" as="fetch" type="application/binary" crossorigin="" />
         <link rel="preload" href="/stories110M.bin" as="fetch" type="application/binary" crossorigin="" />
-        <link rel="module" href="/pkg/port1_bg.js" as="fetch" type="application/javascript" crossorigin="" /> 
+        <link rel="module" href="/pkg/port2_bg.js" as="fetch" type="application/javascript" crossorigin="" /> 
         <script>
             var backup_info = window.console.info;
             function new_info(msg,...args){
                 //debugger;
                 backup_info(msg,...args);
                 document.getElementById("output").value = 
-                document.getElementById("output").value +"\n"+ msg;
+                document.getElementById("output").value +"\n"+msg+" "+args.toString();
             }
             window.console.info = new_info;
-        </script>         
+        </script>       
     </head>
     <body>
         <div>
             <div>
-                <textarea id="prompt" type="text" value="" cols="80" rows="1" placeholder="Not supported for this port" disabled></textarea>
+                <textarea id="prompt" type="text" value="" cols="80" rows="1" placeholder="One day"></textarea>
             </div>
             <select id="model">
                 <option value="stories15M">stories15m</option>
@@ -45,7 +45,7 @@
                 <option value="stories110M">stories110m</option>
             </select>
 
-            <label>temperature</label><input id="temperature" type="number" value="0.9" /> <label>Steps</label><input id="steps" type="number" value="20" />
+            <label>temperature</label><input id="temperature" type="number" value="0.9" /> <label>steps</label><input id="steps" type="number" value="20" />
             <button id="run">run</button>
         </div>
         <textarea id="output" rows="20" cols="80"></textarea>
@@ -59,7 +59,7 @@
         // will "boot" the module and make it ready to use. Currently browsers
         // don't support natively imported WebAssembly as an ES module, but
         // eventually the manual initialization won't be required!
-        import init, { main_wasm } from './pkg/port1.js';
+        import init, { main_wasm } from './pkg/port2.js';
   
         async function run() {
             await init();
@@ -80,12 +80,13 @@
                 return new Uint8Array(buffer);
             });
             console.info("JS: tokenizer_buffer fetched");
-            
+
             let temperature  = document.getElementById("temperature").value;
             let steps = document.getElementById("steps").value;
             let prompt = document.getElementById("prompt").value?? ""; 
 
             let result = main_wasm(model_buffer,tokenizer_buffer,temperature,steps,prompt);
+            console.info("JS: Result = [%s]",result);
         }
   
         run();
