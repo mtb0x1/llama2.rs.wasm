@@ -571,10 +571,9 @@ pub fn main_wasm(
     log::info!("\n");
     log::info!("--------------------------------");
     log::info!(
-        "elapsed: {}.{:03} s, avg tok/MilliSeconds?: {}",
+        "elapsed: {} ms, avg tok/Second: {}",
         elapsed,
-        elapsed,
-        (steps - 1) / elapsed as usize
+        ((steps - 1) / (elapsed as usize/1000)) 
     );
     result
 }
