@@ -1,10 +1,8 @@
-use rayon_wasm::current_num_threads;
-use rayon_wasm::iter::IndexedParallelIterator;
-use rayon_wasm::iter::IntoParallelRefIterator;
-use rayon_wasm::iter::IntoParallelRefMutIterator;
-use rayon_wasm::iter::ParallelIterator;
+use rayon::current_num_threads;
+use rayon::prelude::*;
+ 
 use std::io::{stdout, BufReader, Read, Write};
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::prelude::wasm_bindgen;
 
 // ---------------------------------------------------------------------------
 // RNG (Permuted Congruential Generator)
@@ -475,6 +473,10 @@ fn read_vec<T: FromBytes>(rdr: &mut BufReader<std::io::Cursor<Vec<u8>>>, size: i
     (0..size).map(|_| read::<T>(rdr)).collect()
 }
 
+// need to be called before main_wasm
+// takes num_threads:usize, returns promise
+pub use wasm_bindgen_rayon::init_thread_pool;
+
 #[wasm_bindgen]
 pub fn main_wasm(
     model_buffer: Vec<u8>,     //model_path
@@ -493,16 +495,9 @@ pub fn main_wasm(
         .navigator()
         .hardware_concurrency() as usize;
     log::info!("--> [available 'CPUs' = {}]\n\n", cpus);
-
-    //@todo ...
-    //value: ThreadPoolBuildError
-    //{ kind: IOError(Error { kind: Unsupported, message: "operation not supported on this platform" }) }
-
-    /*let cpus_in_use = (cpus as f64*0.75) as usize;
-    ThreadPoolBuilder::new()
-    .num_threads(cpus_in_use)
-    .build_global()
-    .unwrap();*/
+        
+    // we should be able to use 75% if hardware_concurrency is available,
+    // check init_thread_pool above
 
     let active_cpus = current_num_threads();
     log::info!("--> [Running Inference on {} 'CPUs']\n\n", active_cpus);

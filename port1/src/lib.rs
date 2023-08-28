@@ -1,17 +1,14 @@
 use std::io::{Read, Seek, SeekFrom};
 use std::mem;
-use wasm_bindgen::prelude::*;
 
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
+use wasm_bindgen::prelude::wasm_bindgen;
 use std::io::{self, Write};
 
-use rayon_wasm::current_num_threads;
-//use rayon_wasm::ThreadPoolBuilder;
-use rayon_wasm::iter::IndexedParallelIterator;
-use rayon_wasm::iter::IntoParallelIterator;
-use rayon_wasm::iter::IntoParallelRefMutIterator;
-use rayon_wasm::iter::ParallelIterator;
+use rayon::current_num_threads;
+use rayon::prelude::*;
+
 
 const CONF_VALS: usize = 7;
 const CONF_SIZE: usize = std::mem::size_of::<[i32; CONF_VALS]>();
@@ -531,6 +528,10 @@ impl RunState {
     }
 }
 
+// need to be called before main_wasm
+// takes num_threads:usize, returns promise
+pub use wasm_bindgen_rayon::init_thread_pool;
+
 #[wasm_bindgen]
 pub fn main_wasm(
     model_buffer: Vec<u8>,     //model_path
@@ -547,16 +548,9 @@ pub fn main_wasm(
         .navigator()
         .hardware_concurrency() as usize;
     log::info!("--> [available 'CPUs' = {}]\n\n", cpus);
-
-    //@todo ...
-    //value: ThreadPoolBuildError
-    //{ kind: IOError(Error { kind: Unsupported, message: "operation not supported on this platform" }) }
-
-    /*let cpus_in_use = (cpus as f64*0.75) as usize;
-    ThreadPoolBuilder::new()
-    .num_threads(cpus_in_use)
-    .build_global()
-    .unwrap();*/
+        
+    // we should be able to use 75% if hardware_concurrency is available,
+    // check init_thread_pool above
 
     let active_cpus = current_num_threads();
     log::info!("--> [Running Inference on {} 'CPUs']\n\n", active_cpus);

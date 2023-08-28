@@ -6,7 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rayon-wasm = "1.6.2" #no point if we don't higher throughput
+rayon= "1.7.0"
+wasm-bindgen-rayon = "1.0"
 
 wasm-bindgen = "0.2"
 web-sys = {version="0.3.64",features=["Window","Performance","Navigator"]}
