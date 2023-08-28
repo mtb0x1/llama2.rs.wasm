@@ -1,6 +1,6 @@
 use rayon::current_num_threads;
 use rayon::prelude::*;
- 
+
 use std::io::{stdout, BufReader, Read, Write};
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -189,7 +189,7 @@ fn rmsnorm(o: &mut Vec<f32>, x: &Vec<f32>, weight: &[f32]) {
         .for_each(|((oi, xi), wi)| *oi = *wi * rsqrt * *xi);
 }
 
-fn matmul(o: &mut Vec<f32>, x: &Vec<f32>, w: &[f32], n: usize, _d: usize) {
+fn matmul(o: &mut Vec<f32>, x: &[f32], w: &[f32], n: usize, _d: usize) {
     o.par_iter_mut().enumerate().for_each(|(i, oi)| {
         let mut val: f32 = 0.0;
         for j in 0..n {
@@ -399,7 +399,7 @@ fn sample(probabilities: &Vec<f32>, rng: &mut PCG) -> usize {
     probabilities.len() - 1
 }
 
-fn bpe_encode(text: &[u8], vocab: &Vec<(String, Score)>, max_token_length: usize) -> Vec<usize> {
+fn bpe_encode(text: &[u8], vocab: &[(String, Score)], max_token_length: usize) -> Vec<usize> {
     let mut tokens: Vec<usize> = Vec::new();
 
     for i in 0..text.len() {
@@ -407,7 +407,7 @@ fn bpe_encode(text: &[u8], vocab: &Vec<(String, Score)>, max_token_length: usize
         let (id, _) = vocab
             .iter()
             .enumerate()
-            .find(|x| (*(*x).1).0 == char)
+            .find(|x| x.1 .0 == char)
             .expect("illegal character");
         tokens.push(id);
     }
@@ -420,9 +420,7 @@ fn bpe_encode(text: &[u8], vocab: &Vec<(String, Score)>, max_token_length: usize
             buffer.clear();
             buffer.push_str(&vocab[tokens[i]].0);
             buffer.push_str(&vocab[tokens[i + 1]].0);
-            if let Some((vid, (_, score))) =
-                vocab.iter().enumerate().find(|x| (*(*x).1).0 == buffer)
-            {
+            if let Some((vid, (_, score))) = vocab.iter().enumerate().find(|x| x.1 .0 == buffer) {
                 if *score > best.0 {
                     best = (*score, (vid, i));
                 }
@@ -485,17 +483,18 @@ pub fn main_wasm(
     steps: usize,
     prompt: String,
 ) -> String {
-    let mut result:String=  Default::default();
-    log::info!("Starting inference");
+    let mut result: String = Default::default();
     let _ = console_log::init_with_level(log::Level::Trace);
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
+
+    log::info!("Starting inference with prompt [{}] ", prompt);
 
     let cpus = web_sys::window()
         .expect("no global `window` exists")
         .navigator()
         .hardware_concurrency() as usize;
     log::info!("--> [available 'CPUs' = {}]\n\n", cpus);
-        
+
     // we should be able to use 75% if hardware_concurrency is available,
     // check init_thread_pool above
 
@@ -508,8 +507,7 @@ pub fn main_wasm(
     let mut rdr = std::io::BufReader::new(std::io::Cursor::new(model_buffer));
 
     let config = Config::from_buf_reader(&mut rdr);
-    log::info!("Config loaded {:?}",config);
-
+    log::info!("Config loaded {:?}", config);
 
     let weights = TransformerWeights::from_buf_reader(&mut rdr, &config);
     log::info!("weights loaded");
@@ -529,9 +527,9 @@ pub fn main_wasm(
     // Main generation loop.
     let mut state = RunState::new(&config);
     let perf = web_sys::window()
-    .expect("no global `window` exists")
-    .performance()
-    .expect("should have performance on window");
+        .expect("no global `window` exists")
+        .performance()
+        .expect("should have performance on window");
     let now = || perf.now();
     let start = now();
     let mut next;
@@ -543,26 +541,25 @@ pub fn main_wasm(
 
         if pos < prompt_tokens.len() {
             next = prompt_tokens[pos];
+        } else if temperature == 0.0 {
+            // greedy decoding, choose argmax
+            next = state
+                .logits
+                .iter()
+                .enumerate()
+                .reduce(|(i1, v1), (i2, v2)| if v1 > v2 { (i1, v1) } else { (i2, v2) })
+                .map(|(i, _)| i)
+                .unwrap();
         } else {
-            if temperature == 0.0 {
-                // greedy decoding, choose argmax
-                next = state
-                    .logits
-                    .iter()
-                    .enumerate()
-                    .reduce(|(i1, v1), (i2, v2)| if v1 > v2 { (i1, v1) } else { (i2, v2) })
-                    .map(|(i, _)| i)
-                    .unwrap();
-            } else {
-                // temperature scaling
-                if temperature < 1.0 {
-                    state.logits.iter_mut().for_each(|z| *z /= temperature);
-                }
-                // compute probabilities
-                softmax(&mut state.logits);
-                next = sample(&state.logits, &mut rng);
+            // temperature scaling
+            if temperature < 1.0 {
+                state.logits.iter_mut().for_each(|z| *z /= temperature);
             }
+            // compute probabilities
+            softmax(&mut state.logits);
+            next = sample(&state.logits, &mut rng);
         }
+
         result.push_str(&vocab[next].0);
         log::info!("{}", vocab[next].0);
         stdout().flush().unwrap();

@@ -1,1 +1,1 @@
-./build.sh && cd $1/www && python3 -m http.server 8080 && cd ..
+./build.sh && cd www && python3 -m http.server 8080 && cd ..

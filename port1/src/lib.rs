@@ -3,12 +3,11 @@ use std::mem;
 
 use rand::rngs::SmallRng;
 use rand::{Rng, SeedableRng};
-use wasm_bindgen::prelude::wasm_bindgen;
 use std::io::{self, Write};
+use wasm_bindgen::prelude::wasm_bindgen;
 
 use rayon::current_num_threads;
 use rayon::prelude::*;
-
 
 const CONF_VALS: usize = 7;
 const CONF_SIZE: usize = std::mem::size_of::<[i32; CONF_VALS]>();
@@ -538,17 +537,19 @@ pub fn main_wasm(
     tokenizer_buffer: Vec<u8>, //tokenizer.bin
     temperature: f32,
     seq_len: usize,
-)  {
-    log::info!("Starting inference");
+) {
     let _ = console_log::init_with_level(log::Level::Trace);
     std::panic::set_hook(Box::new(console_error_panic_hook::hook));
+    
+    log::info!("Starting inference");
+
 
     let cpus = web_sys::window()
         .expect("no global `window` exists")
         .navigator()
         .hardware_concurrency() as usize;
     log::info!("--> [available 'CPUs' = {}]\n\n", cpus);
-        
+
     // we should be able to use 75% if hardware_concurrency is available,
     // check init_thread_pool above
 
