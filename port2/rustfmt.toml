@@ -1,0 +1,6 @@
+max_width = 80
+reorder_imports = true
+tab_spaces=2
+newline_style = "Unix"
+match_block_trailing_comma = true
+edition = "2021"

@@ -16,12 +16,24 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    - uses: actions/cache@v3
+      with:
+        path: |
+          ~/.cargo/bin/
+          ~/.cargo/registry/index/
+          ~/.cargo/registry/cache/
+          ~/.cargo/git/db/
+          target/
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
     - name : install rust nightly
       run : | 
         rustup toolchain install nightly-x86_64-unknown-linux-gnu
         rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu
+
     - name: install wasm-pack
       run: cargo install wasm-pack
+
     - name: Build
-      run:  ./build.sh #wasm-pack build --release --target web --out-dir www/pkg/
+      run:  ./build.sh
 
