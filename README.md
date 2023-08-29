@@ -2,7 +2,7 @@
 # rework in progress ...
 I will try to port few llama2.rs to wasm, each will be in a ./portX folder with specific instructions.
 
-A global release including all ports is available in `www`, just run `./run.sh` and go to `http://localhost:8080/`
+A global release including all ports is available in releases section : untar it, run `./run.sh` and go to `http://localhost:8080/`.
 
 Maybe host it as a github page ? 
 

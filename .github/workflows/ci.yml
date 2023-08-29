@@ -31,8 +31,8 @@ jobs:
         rustup toolchain install nightly-x86_64-unknown-linux-gnu
         rustup component add rust-src --toolchain nightly-x86_64-unknown-linux-gnu
 
-    - name: install wasm-pack
-      run: cargo install wasm-pack
+    - name: install wasm-pack 
+      run: cargo install wasm-pack --force
 
     - name: Build
       run:  ./build.sh
