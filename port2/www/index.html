@@ -18,11 +18,11 @@
     </style>
     <head>
         <!-- preload loads 438m+167m+60m+size_of(port2_bg.wasm) ... after few refresh browser memory goes up fast -->
-        <link rel="preload" href="/pkg/port2_bg.wasm" as="fetch" type="application/wasm" crossorigin="" />
-        <link rel="preload" href="/stories42M.bin" as="fetch" type="application/binary" crossorigin="" />
-        <link rel="preload" href="/stories15M.bin" as="fetch" type="application/binary" crossorigin="" />
-        <link rel="preload" href="/stories110M.bin" as="fetch" type="application/binary" crossorigin="" />
-        <link rel="module" href="/pkg/port2_bg.js" as="fetch" type="application/javascript" crossorigin="" /> 
+        <link rel="preload" href="/pkg/port2_bg.wasm" as="fetch" type="application/wasm"/>
+        <link rel="preload" href="/stories42M.bin" as="fetch" type="application/binary"/>
+        <link rel="preload" href="/stories15M.bin" as="fetch" type="application/binary"/>
+        <link rel="preload" href="/stories110M.bin" as="fetch" type="application/binary"/>
+        <link rel="module" href="/pkg/port2_bg.js" as="fetch" type="application/javascript"/> 
         <script>
             var backup_info = window.console.info;
             function new_info(msg,...args){
@@ -45,7 +45,7 @@
                 <option value="stories110M">stories110m</option>
             </select>
 
-            <label>temperature</label><input id="temperature" type="number" value="0.9" /> <label>steps</label><input id="steps" type="number" value="20" />
+            <label>temperature</label><input id="temperature" type="number" value="0.9" /> <label>Steps</label><input id="steps" type="number" value="20" />
             <button id="run">run</button>
         </div>
         <textarea id="output" rows="20" cols="80"></textarea>
@@ -60,18 +60,18 @@
         // don't support natively imported WebAssembly as an ES module, but
         // eventually the manual initialization won't be required!
         import init, { main_wasm, initThreadPool } from './pkg/port2.js';
-  
+        await init();
+
         async function run() {
-            await init();
             if (navigator.hardwareConcurrency >0){
                 const cpus_in_use = Math.ceil(navigator.hardwareConcurrency*0.75);
                 //requires https://stackoverflow.com/questions/72881660/web-worker-blocked-by-self-crossoriginisolated-on-cypress
                 //Cross-Origin-Opener-Policy="same-origin"
-                //Cross-Origin-Resource-Policy="same-site"
                 //Cross-Origin-Embedder-Policy="require-corp"
                 //Fixme(https://github.com/mtb0x1/llama2.rs.wasm/issues/1)
-                //await initThreadPool(cpus_in_use);
+                //initThreadPool(cpus_in_use);
             }
+
             document.getElementById("output").value ="";
             let model = document.getElementById("model").value+".bin";
             const model_buffer =await fetch(model)
@@ -89,8 +89,7 @@
                 return new Uint8Array(buffer);
             });
             console.info("JS: tokenizer_buffer fetched");
-            console.log(tokenizer_buffer);
-
+        
             let temperature  = document.getElementById("temperature").value;
             let steps = document.getElementById("steps").value;
             let prompt = document.getElementById("prompt").value?? ""; 

@@ -21,6 +21,10 @@ export function wbg_rayon_start_worker(receiver: number): void;
 export class wbg_rayon_PoolBuilder {
   free(): void;
 /**
+* @returns {string}
+*/
+  mainJS(): string;
+/**
 * @returns {number}
 */
   numThreads(): number;
@@ -38,6 +42,7 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 export interface InitOutput {
   readonly main_wasm: (a: number, b: number, c: number, d: number, e: number, f: number) => void;
   readonly __wbg_wbg_rayon_poolbuilder_free: (a: number) => void;
+  readonly wbg_rayon_poolbuilder_mainJS: (a: number) => number;
   readonly wbg_rayon_poolbuilder_numThreads: (a: number) => number;
   readonly wbg_rayon_poolbuilder_receiver: (a: number) => number;
   readonly wbg_rayon_poolbuilder_build: (a: number) => void;

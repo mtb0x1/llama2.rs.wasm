@@ -29,9 +29,10 @@
                 //debugger;
                 backup_info(msg,...args);
                 document.getElementById("output").value = 
-                document.getElementById("output").value +"\n"+ msg;
+                document.getElementById("output").value +"\n"+msg+" "+args.toString();
             }
             window.console.info = new_info;
+ 
         </script>         
     </head>
     <body>
@@ -60,18 +61,18 @@
         // don't support natively imported WebAssembly as an ES module, but
         // eventually the manual initialization won't be required!
         import init, { main_wasm, initThreadPool  } from './pkg/port1.js';
-  
+        await init();
+
         async function run() {
-            await init();
             if (navigator.hardwareConcurrency >0){
                 const cpus_in_use = Math.ceil(navigator.hardwareConcurrency*0.75);
                 //requires https://stackoverflow.com/questions/72881660/web-worker-blocked-by-self-crossoriginisolated-on-cypress
                 //Cross-Origin-Opener-Policy="same-origin"
-                //Cross-Origin-Resource-Policy="same-site"
                 //Cross-Origin-Embedder-Policy="require-corp"
                 //Fixme(https://github.com/mtb0x1/llama2.rs.wasm/issues/1)
-                //await initThreadPool(cpus_in_use);
+                //initThreadPool(cpus_in_use);
             }
+            
             document.getElementById("output").value ="";
             let model = document.getElementById("model").value+".bin";
             const model_buffer =await fetch(model)
@@ -101,5 +102,6 @@
         document.getElementById('run').addEventListener('click', run);
 
       </script>
+
     </body>
 </html>

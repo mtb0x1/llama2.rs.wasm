@@ -1,4 +1,4 @@
-import { startWorkers } from './snippets/wasm-bindgen-rayon-7afa899f36665473/src/workerHelpers.js';
+import { startWorkers } from './snippets/wasm-bindgen-rayon-7afa899f36665473/src/workerHelpers.no-bundler.js';
 
 let wasm;
 
@@ -178,6 +178,13 @@ export class wbg_rayon_PoolBuilder {
     free() {
         const ptr = this.__destroy_into_raw();
         wasm.__wbg_wbg_rayon_poolbuilder_free(ptr);
+    }
+    /**
+    * @returns {string}
+    */
+    mainJS() {
+        const ret = wasm.wbg_rayon_poolbuilder_mainJS(this.__wbg_ptr);
+        return takeObject(ret);
     }
     /**
     * @returns {number}
@@ -417,7 +424,11 @@ function __wbg_get_imports() {
         const ret = wasm.memory;
         return addHeapObject(ret);
     };
-    imports.wbg.__wbg_startWorkers_6fd3af285ea11136 = function(arg0, arg1, arg2) {
+    imports.wbg.__wbg_static_accessor_URL_2c9da2bf037bbb2f = function() {
+        const ret = import.meta.url;
+        return addHeapObject(ret);
+    };
+    imports.wbg.__wbg_startWorkers_271dd75b3837d2b0 = function(arg0, arg1, arg2) {
         const ret = startWorkers(takeObject(arg0), takeObject(arg1), wbg_rayon_PoolBuilder.__wrap(arg2));
         return addHeapObject(ret);
     };

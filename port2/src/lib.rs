@@ -599,10 +599,11 @@ pub fn main_wasm(
   let elapsed = now() - start;
   log::info!("\n");
   log::info!("--------------------------------");
+  log::info!( "elapsed: {} steps {}",elapsed,steps);
   log::info!(
-    "elapsed: {} ms, avg tok/Second: {}",
+    "elapsed: {} ms, avg tok/Second: {:2}",
     elapsed,
-    ((steps - 1) / (elapsed as usize / 1000))
+    ((steps - 1) as f64 / (elapsed) as f64)*1000.0
   );
   result
 }
