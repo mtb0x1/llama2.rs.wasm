@@ -62,7 +62,8 @@
         // eventually the manual initialization won't be required!
         import init, { main_wasm, initThreadPool  } from './pkg/port1.js';
         await init();
-
+        await initThreadPool(navigator.hardwareConcurrency);
+        
         async function run() {
             if (navigator.hardwareConcurrency >0){
                 const cpus_in_use = Math.ceil(navigator.hardwareConcurrency*0.75);
@@ -70,7 +71,7 @@
                 //Cross-Origin-Opener-Policy="same-origin"
                 //Cross-Origin-Embedder-Policy="require-corp"
                 //Fixme(https://github.com/mtb0x1/llama2.rs.wasm/issues/1)
-                //initThreadPool(cpus_in_use);
+                //await initThreadPool(cpus_in_use);
             }
             
             document.getElementById("output").value ="";
