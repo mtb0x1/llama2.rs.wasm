@@ -9,6 +9,30 @@ This demo relies on notables implenation higlighted in [here](https://github.com
 2) Run `python3 -m http.server 8080` in `www` folder.
 3) Open `http://127.0.0.1:8080/` in your browser.
 
+or
+
+1) run `wasm-pack build --release --target web --out-dir www/pkg/ --verbose`
+2) download models :
+```bash
+cd stories/
+wget -P www/ https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin
+wget -P www/ https://huggingface.co/karpathy/tinyllamas/resolve/main/stories42M.bin
+wget -P www/ https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M.bin
+for i in $(ls -d port*/www/)
+do
+    cd $i
+    ln -s ../../stories/stories15M.bin . 
+    ln -s ../../stories/stories42M.bin .
+    ln -s ../../stories/stories110M.bin .
+done
+```
+3) Run `python3 -m http.server 8080` in `www` folder.
+4) Open `http://127.0.0.1:8080/` in your browser.
+
+or
+
+check it live demo [here](tbd)
+
 ## Credit
 1. Port1 [A dirty and minimal port of @Gaxler llama2.rs](https://github.com/mtb0x1/llama2.rs.wasm/blob/main/port1/README.md).
 2. Port2 [A dirty and minimal port of @Leo-du llama2.rs](https://github.com/mtb0x1/llama2.rs.wasm/blob/main/port2/README.md).
