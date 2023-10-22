@@ -1,67 +1,91 @@
-<html>
-    <meta charset="utf-8" />
-    <title>port2</title>
-    <style>
-        body {
-            padding: 1em;
-        }
-        label,
-        button {
-            margin: 0.5em;
-        }
-        input {
-            width: 5em;
-        }
-        textarea {
-            padding: 1em;
-        }
-    </style>
+<!DOCTYPE html>
+<html lang="en">
     <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>llama2.rs.wasm - port2</title>
+        <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/water.css@2/out/dark.css"
+        />
+        <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+        />
+
         <!-- preload loads 438m+167m+60m+size_of(port2_bg.wasm) ... after few refresh browser memory goes up fast -->
         <link rel="preload" href="/pkg/port2_bg.wasm" as="fetch" type="application/wasm"/>
         <link rel="preload" href="/stories42M.bin" as="fetch" type="application/binary"/>
         <link rel="preload" href="/stories15M.bin" as="fetch" type="application/binary"/>
         <link rel="preload" href="/stories110M.bin" as="fetch" type="application/binary"/>
-        <link rel="module" href="/pkg/port2_bg.js" as="fetch" type="application/javascript"/> 
         <script>
-            var backup_info = window.console.info;
-            function new_info(msg,...args){
-                //debugger;
-                backup_info(msg,...args);
-                document.getElementById("output").value = 
-                document.getElementById("output").value +"\n"+msg+" "+args.toString();
+            function log(msg,...args){
+                if (document.getElementById("debug_info").checked) {
+                    document.getElementById("debug_content1").value+=msg;
+                }
             }
-            window.console.info = new_info;
-        </script>       
+            function enabledebug(){
+                //console.log(this);
+                document.getElementById("debug_content1").value="";
+                if (!document.getElementById("debug_info").checked) {
+                    document.getElementById("debug_content").style="display:none;";
+                }else {
+                    document.getElementById("debug_content").style="";
+                }
+            }
+        </script>     
     </head>
     <body>
-        <div>
-            <div>
-                <textarea id="prompt" type="text" value="" cols="80" rows="1" placeholder="One day"></textarea>
-            </div>
+        <div class="container">
+            <h1>llama2.rs.wasm - port2</h1>
+    
+            <h3>Links</h3>
+            <p>
+            <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://github.com/mtb0x1/llama2.rs.wasm"
+                style="all: unset; cursor: pointer; font-size: 0.9em"
+            >
+            <i class="fa-brands fa-github fa-xl"></i>
+            llama2.rs.wasm Source Code
+            </a>
+            </p>
+    
+            <label for="model">Model</label>
             <select id="model">
                 <option value="stories15M">stories15m</option>
                 <option selected="selected" value="stories42M">stories42m</option>
                 <option value="stories110M">stories110m</option>
             </select>
-
-            <label>temperature</label><input id="temperature" type="number" value="0.9" /> <label>Steps</label><input id="steps" type="number" value="20" />
-            <button id="run">run</button>
+            <label for="temperature">Temperature</label>
+            <input id="temperature" type="number" value="0.9" step=".01" min="0" max="1"  /> 
+            <label for="steps">Steps</label>
+            <input id="steps" type="number" value="20" />
+            <label for="debug_info">Debug info:</label>
+            <input id="debug_info" type="checkbox" onchange="enabledebug()"/></br>
+            <label for="prompt">Prompt:</label>
+            <textarea id="prompt" name="prompt" rows="10" placeholder="write something here ..."></textarea>
+            <div id="debug_content" style="display:none">
+            <label for="debug_content1">Debug content:</label>
+            <textarea id="debug_content1" name="prompt" rows="10" disabled></textarea>
+            </div>
+            <button id="run" class="flat">Run</button>
+            <div id="meta">
+                <label for="token_per_second">Token per second:</label>
+                <input id="token_per_second" type="number" value="0" disabled/>
+                <p>*for acurate measure, close other tabs and restart browser.
+                    Performance is reduced by 10x after a couple of runs.</p>
+            </div>
         </div>
-        <textarea id="output" rows="20" cols="80"></textarea>
-        <p><span>achieved tok/s: </span><span id="toks"></span></p>
-          <!-- Note the usage of `type=module` here as this is an ES6 module -->
     <script type="module">
-        // Use ES module import syntax to import functionality from the module
-        // that we have compiled.
-        //
-        // Note that the `default` import is an initialization function which
-        // will "boot" the module and make it ready to use. Currently browsers
-        // don't support natively imported WebAssembly as an ES module, but
-        // eventually the manual initialization won't be required!
-        import init, { main_wasm, initThreadPool } from './pkg/port2.js';
+        import init, { port2_main_wasm, initThreadPool  } from './pkg/port2.js';
         await init();
-
+        //await initThreadPool(navigator.hardwareConcurrency);
+        
         async function run() {
             if (navigator.hardwareConcurrency >0){
                 const cpus_in_use = Math.ceil(navigator.hardwareConcurrency*0.75);
@@ -69,10 +93,10 @@
                 //Cross-Origin-Opener-Policy="same-origin"
                 //Cross-Origin-Embedder-Policy="require-corp"
                 //Fixme(https://github.com/mtb0x1/llama2.rs.wasm/issues/1)
-                //initThreadPool(cpus_in_use);
+                //await initThreadPool(cpus_in_use);
             }
-
-            document.getElementById("output").value ="";
+            
+            //document.getElementById("prompt").value ="";
             let model = document.getElementById("model").value+".bin";
             const model_buffer =await fetch(model)
             .then(response => response.arrayBuffer())
@@ -80,7 +104,7 @@
                 // Convert the ArrayBuffer to a Uint8Array
                 return new Uint8Array(buffer);
             });
-            console.info("JS: model_buffer fetched");
+            log("JS: model_buffer fetched\n");  
 
             const tokenizer_buffer =await fetch('tokenizer.bin')
             .then(response => response.arrayBuffer())
@@ -88,19 +112,22 @@
                 // Convert the ArrayBuffer to a Uint8Array
                 return new Uint8Array(buffer);
             });
-            console.info("JS: tokenizer_buffer fetched");
-        
+            log("JS: tokenizer_buffer fetched\n");
+            
             let temperature  = document.getElementById("temperature").value;
             let steps = document.getElementById("steps").value;
             let prompt = document.getElementById("prompt").value?? ""; 
 
-            let result = main_wasm(model_buffer,tokenizer_buffer,temperature,steps,prompt);
-            console.info("JS: Result = [%s]",result);
+            let result = port2_main_wasm(model_buffer,tokenizer_buffer,temperature,steps,prompt);
+            document.getElementById("prompt").value = result.result?? "";
+            document.getElementById("token_per_second").value = result.token_per_second?? 0;
+            log(result.logs?? "");
         }
   
         //run();
         document.getElementById('run').addEventListener('click', run);
 
       </script>
+
     </body>
 </html>

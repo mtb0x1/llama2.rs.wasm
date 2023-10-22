@@ -35,5 +35,5 @@ jobs:
       run: cargo install wasm-pack --force
 
     - name: Build
-      run:  ./build.sh
+      run:  wasm-pack build --release --target web --out-dir www/pkg/ --verbose
 

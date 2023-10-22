@@ -1,31 +1,27 @@
 [package]
-name = "port2"
+name = "llama2-rs-wasm"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-rayon= "1.7.0"
+port1 = { path = "./port1" }
+port2 = { path = "./port2" }
+port3 = { path = "./port3" }
+port4 = { path = "./port4" }
+port5 = { path = "./port5" }
+port6 = { path = "./port6" }
 wasm-bindgen-rayon = { version = "1.0", features = ["no-bundler"] }
-
 wasm-bindgen = "0.2"
-web-sys = {version="0.3.64",features=["Window","Performance","Navigator"]}
-console_log = {version="1.0.0",features=["color","wasm-bindgen"]}
-console_error_panic_hook = "0.1.7"
-log = "0.4.19"
 js-sys = "0.3.64"
- 
+
 [profile.release]
-opt-level = 3
-debug = false
 panic = "abort"
-debug-assertions = false
-overflow-checks = false
-lto = true
-incremental = false
+
 
 [lib]
-name="port2"
+name = "llama2_rs_wasm"
 path = "src/lib.rs"
 crate-type = ["cdylib", "rlib"]
+

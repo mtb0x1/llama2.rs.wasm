@@ -1,7 +1,8 @@
-use std::io::{stdout, BufReader, Read, Write};
-
+use js_sys::Object;
+use js_sys::Reflect;
 use rayon::{current_num_threads, prelude::*};
-use wasm_bindgen::prelude::wasm_bindgen;
+use std::io::{stdout, BufReader, Read, Write};
+use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
 // RNG (Permuted Congruential Generator)
 pub struct PCG {
@@ -504,30 +505,28 @@ fn read_vec<T: FromBytes>(
 pub use wasm_bindgen_rayon::init_thread_pool;
 
 #[wasm_bindgen]
-pub fn main_wasm(
+pub fn port2_main_wasm(
   model_buffer: Vec<u8>,     // model_path
   tokenizer_buffer: Vec<u8>, // tokenizer.bin
   temperature: f32,
   steps: usize,
   prompt: String,
-) -> String {
-  let mut result: String = Default::default();
+) -> Object {
   let _ = console_log::init_with_level(log::Level::Trace);
   std::panic::set_hook(Box::new(console_error_panic_hook::hook));
 
-  log::info!("Starting inference with prompt [{}] ", prompt);
+  let mut logs: Vec<String> = Vec::with_capacity((8 * 32) + steps);
+  let mut result: Vec<String> = Vec::with_capacity(steps);
+  let mut token_per_second: f64 = 0f64;
 
-  let cpus = web_sys::window()
-    .expect("no global `window` exists")
-    .navigator()
-    .hardware_concurrency() as usize;
-  log::info!("--> [available 'CPUs' = {}]\n\n", cpus);
+  logs.push("using port2".into());
 
-  // we should be able to use 75% if hardware_concurrency is available,
-  // check init_thread_pool above
+  let alog = format!("Starting inference with prompt [{}] ", prompt);
+  logs.push(alog);
 
   let active_cpus = current_num_threads();
-  log::info!("--> [Running Inference on {} 'CPUs']\n\n", active_cpus);
+  let alog = format!("--> [Running Inference on {} 'CPUs']", active_cpus);
+  logs.push(alog);
 
   let rng_seeds = (42, 54);
   let mut rng = PCG::new(rng_seeds.0, rng_seeds.1);
@@ -535,14 +534,14 @@ pub fn main_wasm(
   let mut rdr = std::io::BufReader::new(std::io::Cursor::new(model_buffer));
 
   let config = Config::from_buf_reader(&mut rdr);
-  log::info!("Config loaded {:?}", config);
+  logs.push("Config loaded".into());
 
   let weights = TransformerWeights::from_buf_reader(&mut rdr, &config);
-  log::info!("weights loaded");
+  logs.push("Weights loaded".into());
 
   let (vocab, max_token_length) =
     read_tokenizer(config.vocab_size as usize, tokenizer_buffer);
-  log::info!("Vocab loaded");
+  logs.push("Vocab loaded".into());
 
   // parse prompt from user input
   // ensure at least "" is specified in js code
@@ -564,7 +563,8 @@ pub fn main_wasm(
   let mut next;
   let mut token = 1; // token 1 is <s> (bos) in the vocab
   let mut pos: usize = 0;
-  log::info!("<s>");
+  //log::info!("<s>");
+  logs.push("<s>".into());
   while pos < steps {
     transformer(token, pos, &config, &mut state, &weights);
 
@@ -588,22 +588,41 @@ pub fn main_wasm(
       softmax(&mut state.logits);
       next = sample(&state.logits, &mut rng);
     }
+    let got_token = &vocab[next].0;
+    result.push(got_token.into());
+    let alog = format!("vocab[next].0 : {}", got_token);
+    logs.push(alog);
 
-    result.push_str(&vocab[next].0);
-    log::info!("{}", vocab[next].0);
+    //@todo is this really needed?
     stdout().flush().unwrap();
 
     token = next as i32;
     pos += 1;
   }
   let elapsed = now() - start;
-  log::info!("\n");
-  log::info!("--------------------------------");
-  log::info!( "elapsed: {} steps {}",elapsed,steps);
-  log::info!(
+  logs.push("\n".into());
+  logs.push("--------------------------------".into());
+  logs.push(format!("elapsed: {} steps {}", elapsed, steps));
+  token_per_second = ((steps - 1) as f64 / (elapsed) as f64) * 1000.0;
+  logs.push(format!(
     "elapsed: {} ms, avg tok/Second: {:2}",
-    elapsed,
-    ((steps - 1) as f64 / (elapsed) as f64)*1000.0
+    elapsed, token_per_second
+  ));
+
+  let logs = JsValue::from(logs.join("\n"));
+  let result = JsValue::from(
+    result
+      .into_iter()
+      .map(|mut s| if s.starts_with(' ') { s } else { s.insert_str(0," "); s })
+      .collect::<String>(),
   );
-  result
+  let token_per_second = JsValue::from(token_per_second);
+
+  let ret = Object::new();
+  //@todo use define_property instead of reflect
+  //Object::define_property(&ret, &logs,&Object::new());
+  Reflect::set(&ret, &"logs".into(), &logs).unwrap();
+  Reflect::set(&ret, &"result".into(), &result).unwrap();
+  Reflect::set(&ret, &"token_per_second".into(), &token_per_second).unwrap();
+  ret
 }

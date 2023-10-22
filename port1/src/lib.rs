@@ -3,9 +3,11 @@ use std::{
   mem,
 };
 
+use js_sys::Object;
+use js_sys::Reflect;
 use rand::{rngs::SmallRng, Rng, SeedableRng};
 use rayon::{current_num_threads, prelude::*};
-use wasm_bindgen::prelude::wasm_bindgen;
+use wasm_bindgen::{prelude::wasm_bindgen, JsValue};
 
 const CONF_VALS: usize = 7;
 const CONF_SIZE: usize = std::mem::size_of::<[i32; CONF_VALS]>();
@@ -565,37 +567,36 @@ impl RunState {
 pub use wasm_bindgen_rayon::init_thread_pool;
 
 #[wasm_bindgen]
-pub fn main_wasm(
+pub fn port1_main_wasm(
   model_buffer: Vec<u8>,     // model_path
   tokenizer_buffer: Vec<u8>, // tokenizer.bin
   temperature: f32,
   seq_len: usize,
-) {
+) -> Object {
   let _ = console_log::init_with_level(log::Level::Trace);
   std::panic::set_hook(Box::new(console_error_panic_hook::hook));
 
-  log::info!("Starting inference");
+  let mut logs: Vec<String> = Vec::with_capacity((8 * 32) + seq_len);
+  let mut result: Vec<String> = Vec::with_capacity(seq_len);
+  let mut token_per_second: f64 = 0f64;
 
-  let cpus = web_sys::window()
-    .expect("no global `window` exists")
-    .navigator()
-    .hardware_concurrency() as usize;
-  log::info!("--> [available 'CPUs' = {}]\n\n", cpus);
+  logs.push("using port1".into());
 
-  // we should be able to use 75% if hardware_concurrency is available,
-  // check init_thread_pool above
+  logs.push("Starting inference".into());
 
   let active_cpus = current_num_threads();
-  log::info!("--> [Running Inference on {} 'CPUs']\n\n", active_cpus);
+  let alog = format!("--> [Running Inference on {} 'CPUs']", active_cpus);
+  logs.push(alog);
 
   let mut model_buffer: Vec<u8> = model_buffer;
   let mut tokenizer_buffer: Vec<u8> = tokenizer_buffer;
 
   let config = Config::from_file(&mut model_buffer);
-  log::info!("Config loaded");
+  logs.push("Config loaded".into());
 
   let vocab = Vocab::from_file(config.vocab_size, &mut tokenizer_buffer);
-  log::info!("Vocab loaded");
+  logs.push("Vocab loaded".into());
+
   let perf = web_sys::window()
     .expect("no global `window` exists")
     .performance()
@@ -604,7 +605,9 @@ pub fn main_wasm(
   let st = now();
   let weights =
     TransformerWeights::<Ty>::read_from_file(&config, &mut model_buffer);
-  log::info!("--> [Loaded weights in {} MilliSecs?]\n\n", now() - st);
+
+  let alog = format!("--> [Loaded weights in {} MilliSecs.]", now() - st);
+  logs.push(alog);
 
   let mut benches = vec![];
   for _ in 0..1 {
@@ -633,7 +636,12 @@ pub fn main_wasm(
         inplace_softmax(&mut probs);
         cdf_sample(&probs)
       };
-      log::info!("vocab.get_token : {}", vocab.get_token(next));
+
+      let got_token = vocab.get_token(next);
+      let alog = format!("vocab.get_token : {}", &got_token);
+      logs.push(alog);
+      result.push(got_token.into());
+
       io::stdout().flush().unwrap();
       pos += 1;
       token = next;
@@ -644,5 +652,24 @@ pub fn main_wasm(
   let ts = benches.iter().fold(0f64, |acc, v| acc + v);
   let ts = ts / (benches.len() as f64);
 
-  log::info!("\n{:.5} Tokens/MilliSec?", ts);
+  let alog = format!("{:.5} Tokens/MilliSec", ts);
+  logs.push(alog);
+  token_per_second = ts * 1000f64;
+
+  let logs = JsValue::from(logs.join("\n"));
+  let result = JsValue::from(
+    result
+      .into_iter()
+      .map(|mut s| if s.starts_with(' ') { s } else { s.insert_str(0," "); s })
+      .collect::<String>(),
+  );
+  let token_per_second = JsValue::from(token_per_second);
+
+  let ret = Object::new();
+  //@todo use define_property instead of reflect
+  //Object::define_property(&ret, &logs,&Object::new());
+  Reflect::set(&ret, &"logs".into(), &logs).unwrap();
+  Reflect::set(&ret, &"result".into(), &result).unwrap();
+  Reflect::set(&ret, &"token_per_second".into(), &token_per_second).unwrap();
+  ret
 }

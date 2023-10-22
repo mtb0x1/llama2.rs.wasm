@@ -1,190 +1,170 @@
-<html>
-    <meta charset="utf-8" />
-    <title>llama2.rs.wasm</title>
-    <style>
-        body {
-            padding: 1em;
-        }
-        label,
-        button {
-            margin: 0.5em;
-        }
-        input {
-            width: 5em;
-        }
-        textarea {
-            padding: 1em;
-        }
-    </style>
+<!DOCTYPE html>
+<html lang="en">
     <head>
-        <!-- preload loads ALOT of junk @todo, memory goes up fast -->
-        <link rel="preload" href="/pkg_port1/port1_bg.wasm" as="fetch" type="application/wasm"/>
-        <link rel="preload" href="/pkg_port2/port2_bg.wasm" as="fetch" type="application/wasm"/>
-        <link rel="preload" href="/tokenizer_port1.bin" as="fetch" type="application/binary"/>
-        <link rel="preload" href="/tokenizer_port2.bin" as="fetch" type="application/binary"/>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>llama2.rs.wasm</title>
+        <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/water.css@2/out/dark.css"
+        />
+        <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
+        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+        />
 
-        <!--
-        <link rel="preload" href="https://huggingface.co/karpathy/tinyllamas/resolve/main/stories42M.bin" as="fetch" type="application/binary"/>
-        <link rel="preload" href="https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin" as="fetch" type="application/binary"/>
-        <link rel="preload" href="https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M.bin" as="fetch" type="application/binary"/>
-        -->
-        
-        <link rel="module" href="/pkg_port1/port1_bg.js" as="fetch" type="application/javascript"/> 
-        <link rel="module" href="/pkg_port2/port2_bg.js" as="fetch" type="application/javascript"/>
+        <!-- preload loads 438m+167m+60m+size_of(port2_bg.wasm) ... after few refresh browser memory goes up fast -->
+        <link rel="preload" href="/pkg/llama2_rs_wasm_bg.wasm" as="fetch" type="application/wasm"/>
         <script>
             const stories = { 
                 stories15M : "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin",
                 stories42M : "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories42M.bin",
                 stories110M : "https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M.bin",
             };
-            let runtimes = {};
-  
-            function append_to_output(msg,...args){
-                document.getElementById("output").value = 
-                document.getElementById("output").value +"\n"+ msg;
-            }
- 
-            function onChangePort(port){
-                document.getElementById("output").value = "";
-                if(port && port=="port1"){
-                    document.getElementById("prompt").disabled="disabled";
-                    document.getElementById("prompt").value="not supported for this port";
-                }else{
-                    document.getElementById("prompt").disabled="";
-                    document.getElementById("prompt").value="";
+
+            const tokenizers = { 
+                //port1 : "https://cdn.jsdelivr.net/gh/gaxler/llama2.rs/tokenizer.bin",
+                port1: "port1_tokenizer.bin",
+                //port2 : "https://cdn.jsdelivr.net/gh/leo-du/llama2.rs/tokenizer.bin"
+                port2: "port2_tokenizer.bin",
+                //port3 : "https://cdn.jsdelivr.net/gh/danielgrittner/llama2-rs/tokenizer.bin"
+                port3: "port3_tokenizer.bin",
+                //port4 : "https://cdn.jsdelivr.net/gh/lintian06/llama2.rs/tokenizer.bin"
+                port4: "port4_tokenizer.bin",
+                //port5 : "https://cdn.jsdelivr.net/gh/rahoua/pecca-rs/tokenizer.bin"
+                port5: "port5_tokenizer.bin",
+                //port6 : "https://cdn.jsdelivr.net/gh/flaneur2020/llama2.rs/tokenizer.bin"
+                port6: "port4_tokenizer.bin",
+            };
+
+            function log(msg,...args){
+                if (document.getElementById("debug_info").checked) {
+                    document.getElementById("debug_content1").value+=msg;
                 }
             }
-        </script>         
+
+            function enabledebug(){
+                //console.log(this);
+                document.getElementById("debug_content1").value="";
+                if (!document.getElementById("debug_info").checked) {
+                    document.getElementById("debug_content").style="display:none;";
+                }else {
+                    document.getElementById("debug_content").style="";
+                }
+            }
+
+            function onchange(){
+                //console.log(this);
+                document.getElementById("debug_content1").value="";
+                document.getElementById("prompt").value="";
+            }
+
+            function onmodelchange(){
+                onchange();
+            }
+            function onimplchange(){
+                onchange();
+            }
+        </script>     
     </head>
     <body>
-        <div>
-            <div>
-                <select id="whichport" onchange="onChangePort(this.value)">
-                    <option value="port1" noprompt="true">@Gaxler's (port1)</option>
-                    <option selected="selected" value="port2"> @leo-du's (port2)</option>
-                </select>
-            </div>
+        <div class="container">
+            <h1>llama2.rs.wasm</h1>
+    
+            <h3>Links</h3>
+            <p>
+            <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://github.com/mtb0x1/llama2.rs.wasm"
+                style="all: unset; cursor: pointer; font-size: 0.9em"
+            >
+            <i class="fa-brands fa-github fa-xl"></i>
+            llama2.rs.wasm Source Code
+            </a>
+            </p>
 
-            <div>
-                <textarea id="prompt" type="text" value="" cols="80" rows="1"></textarea>
-            </div>
-            <select id="model">
+            <label for="WhichImpl">Which port</label>
+            <select id="WhichImpl" onchange="onimplchange();">
+                <option value="port1">port1 - @gaxler *prompt not supported</option>
+                <option selected="selected" value="port2">port2 - @leo-du</option>
+                <option value="port3">port3 - @danielgrittner</option>
+                <option value="port4">port4 - @lintian06</option>
+                <option value="port5">port5 - @rahoua</option>
+                <option value="port6">port6 - @flaneur2020</option>
+            </select>
+
+            <label for="model">Model</label>
+            <select id="model" onchange="onmodelchange();">
                 <option value="stories15M">stories15m</option>
                 <option selected="selected" value="stories42M">stories42m</option>
                 <option value="stories110M">stories110m</option>
             </select>
-
-            <label>temperature</label><input id="temperature" type="number" value="0.9" /> <label>Steps</label><input id="steps" type="number" value="20" />
-            <button id="run">run</button>
+            <label for="temperature">Temperature</label>
+            <input id="temperature" type="number" value="0.9" step=".01" min="0" max="1"  /> 
+            <label for="steps">Steps</label>
+            <input id="steps" type="number" value="20" />
+            <label for="debug_info">Debug info:</label>
+            <input id="debug_info" type="checkbox" onchange="enabledebug()"/></br>
+            <label for="prompt">Prompt:</label>
+            <textarea id="prompt" name="prompt" rows="10" placeholder="write something here ..."></textarea>
+            <div id="debug_content" style="display:none">
+            <label for="debug_content1">Debug content:</label>
+            <textarea id="debug_content1" name="prompt" rows="10" disabled></textarea>
+            </div>
+            <button id="run" class="flat">Run</button>
+            <div id="meta">
+                <label for="token_per_second">Token per second:</label>
+                <input id="token_per_second" type="number" value="0" disabled/>
+                <p>*for acurate measure, close other tabs and restart browser.
+                    Performance is reduced by 10x after a couple of runs.</p>
+            </div>
         </div>
-        <textarea id="output" rows="20" cols="80"></textarea>
-        <p><span>achieved tok/s: </span><span id="toks"></span></p>
-        <!-- Note the usage of `type=module` here as this is an ES6 module -->
-        <script type="module" id="port1">
-            // Use ES module import syntax to import functionality from the module
-            // that we have compiled.
-            //
-            // Note that the `default` import is an initialization function which
-            // will "boot" the module and make it ready to use. Currently browsers
-            // don't support natively imported WebAssembly as an ES module, but
-            // eventually the manual initialization won't be required!
-            import init, {main_wasm, initThreadPool  } from './pkg_port1/port1.js';
-            async function run_port1() {
-                await init();
-                if (navigator.hardwareConcurrency >0){
-                    const cpus_in_use = Math.ceil(navigator.hardwareConcurrency*0.75);
-                    //requires https://stackoverflow.com/questions/72881660/web-worker-blocked-by-self-crossoriginisolated-on-cypress
-                    //Cross-Origin-Opener-Policy="same-origin"
-                    //Cross-Origin-Resource-Policy="same-site"
-                    //Cross-Origin-Embedder-Policy="require-corp"
-                    //Fixme(https://github.com/mtb0x1/llama2.rs.wasm/issues/1)
-                    //await initThreadPool(cpus_in_use);
-                }
-                document.getElementById("output").value ="";
-                let model = stories[document.getElementById("model").value];
-                const model_buffer =await fetch(model)
-                .then(response => response.arrayBuffer())
-                .then(buffer => {
-                    // Convert the ArrayBuffer to a Uint8Array
-                    return new Uint8Array(buffer);
-                });
-                append_to_output("JS: model_buffer fetched");
+    <script type="module">
+        import init, { main_wasm, initThreadPool  } from './pkg/llama2_rs_wasm.js';
+        await init();
+        if (navigator.hardwareConcurrency >0){
+            const cpus_in_use = Math.ceil(navigator.hardwareConcurrency*0.75);
+            //requires https://stackoverflow.com/questions/72881660/web-worker-blocked-by-self-crossoriginisolated-on-cypress
+            //Cross-Origin-Opener-Policy="same-origin"
+            //Cross-Origin-Embedder-Policy="require-corp"
+            //Fixme(https://github.com/mtb0x1/llama2.rs.wasm/issues/1)
+            //await initThreadPool(cpus_in_use);
+        }
 
-                const tokenizer_buffer =await fetch('tokenizer_port1.bin')
-                .then(response => response.arrayBuffer())
-                .then(buffer => {
-                    // Convert the ArrayBuffer to a Uint8Array
-                    return new Uint8Array(buffer);
-                });
-                append_to_output("JS: tokenizer_buffer fetched");
-                
-                let temperature  = document.getElementById("temperature").value;
-                let steps = document.getElementById("steps").value;
-                let prompt = document.getElementById("prompt").value?? ""; 
-
-                let result = main_wasm(model_buffer,tokenizer_buffer,temperature,steps,/*not used*/prompt);
-                append_to_output("JS: Result =["+result+"]"); // this one doesn't return a thing, yet ?
-            }
-            runtimes.port1 = run_port1;
-            //document.getElementById('run').addEventListener('click', run_port1);
-
-        </script>
-        
-        <script type="module" id="port2">
-            // Use ES module import syntax to import functionality from the module
-            // that we have compiled.
-            //
-            // Note that the `default` import is an initialization function which
-            // will "boot" the module and make it ready to use. Currently browsers
-            // don't support natively imported WebAssembly as an ES module, but
-            // eventually the manual initialization won't be required!
-            import init, {main_wasm, initThreadPool  } from './pkg_port2/port2.js';
-            async function run_port2() {
-                await init();
-                if (navigator.hardwareConcurrency >0){
-                    const cpus_in_use = Math.ceil(navigator.hardwareConcurrency*0.75);
-                    //requires https://stackoverflow.com/questions/72881660/web-worker-blocked-by-self-crossoriginisolated-on-cypress
-                    //Cross-Origin-Opener-Policy="same-origin"
-                    //Cross-Origin-Resource-Policy="same-site"
-                    //Cross-Origin-Embedder-Policy="require-corp"
-                    //Fixme(https://github.com/mtb0x1/llama2.rs.wasm/issues/1)
-                    //await initThreadPool(cpus_in_use);
-                }
-                document.getElementById("output").value ="";
-                let model = stories[document.getElementById("model").value];
-                const model_buffer =await fetch(model)
-                .then(response => response.arrayBuffer())
-                .then(buffer => {
-                    // Convert the ArrayBuffer to a Uint8Array
-                    return new Uint8Array(buffer);
-                });
-                append_to_output("JS: model_buffer fetched");
-    
-                const tokenizer_buffer =await fetch('tokenizer_port2.bin')
-                .then(response => response.arrayBuffer())
-                .then(buffer => {
-                    // Convert the ArrayBuffer to a Uint8Array
-                    return new Uint8Array(buffer);
-                });
-                append_to_output("JS: tokenizer_buffer fetched");
-                
-                let temperature  = document.getElementById("temperature").value;
-                let steps = document.getElementById("steps").value;
-                let prompt = document.getElementById("prompt").value?? ""; 
-    
-                let result = main_wasm(model_buffer,tokenizer_buffer,temperature,steps,prompt);
-                append_to_output("JS: Result = ["+result+"]");
-            }
-            runtimes.port2 = run_port2;
-            //document.getElementById('run').addEventListener('click', run_port2);
-    
-            </script>
-            <script>
-                function run(){
-                    runtimes[document.getElementById("whichport").value]();
-                }
-                document.getElementById('run').addEventListener('click',run);
-            </script>
+        async function run() {
+            let model = stories[document.getElementById("model").value];
+            const model_buffer =await fetch(model)
+            .then(response => response.arrayBuffer())
+            .then(buffer => {
+                // Convert the ArrayBuffer to a Uint8Array
+                return new Uint8Array(buffer);
+            });
+            log("JS: model_buffer fetched\n");  
+            let tokenizer = tokenizers[document.getElementById("WhichImpl").value];
+            const tokenizer_buffer =await fetch(tokenizer)
+            .then(response => response.arrayBuffer())
+            .then(buffer => {
+                // Convert the ArrayBuffer to a Uint8Array
+                return new Uint8Array(buffer);
+            });
+            log("JS: tokenizer_buffer fetched\n");
             
+            let temperature  = document.getElementById("temperature").value;
+            let steps = document.getElementById("steps").value;
+            let prompt = document.getElementById("prompt").value?? ""; 
+            let WhichImpl = document.getElementById("WhichImpl").value;
+
+            let result = main_wasm(model_buffer,tokenizer_buffer,temperature,steps,prompt,WhichImpl);
+            document.getElementById("prompt").value = result.result?? "";
+            document.getElementById("token_per_second").value = result.token_per_second?? 0;
+            log(result.logs?? "");
+        }
+        document.getElementById('run').addEventListener('click', run);
+    </script>
+
     </body>
 </html>
