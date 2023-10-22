@@ -14,10 +14,10 @@ or
 1) run `wasm-pack build --release --target web --out-dir www/pkg/ --verbose`
 2) download models :
 ```bash
-cd stories/
-wget -P www/ https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin
-wget -P www/ https://huggingface.co/karpathy/tinyllamas/resolve/main/stories42M.bin
-wget -P www/ https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M.bin
+mkdir -p stories/
+wget -P stories/ https://huggingface.co/karpathy/tinyllamas/resolve/main/stories15M.bin
+wget -P stories/ https://huggingface.co/karpathy/tinyllamas/resolve/main/stories42M.bin
+wget -P stories/ https://huggingface.co/karpathy/tinyllamas/resolve/main/stories110M.bin
 for i in $(ls -d port*/www/)
 do
     cd $i
