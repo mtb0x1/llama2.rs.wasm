@@ -49,5 +49,5 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
-      - name: install wasm-pack
-        run: rm -rf . && wget https://github.com/mtb0x1/llama2.rs.wasm/releases/download/latest/www.tar.gz && tar xzvf www.tar.gz && mv www/* .
+      - name: custom stuff
+        run: ls -l
