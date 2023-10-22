@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-clap = { version = "4.0", features = ["derive"] }
 rand = "0.8.5"
 rayon = "1.7.0"
 num_cpus = "1.16.0"
