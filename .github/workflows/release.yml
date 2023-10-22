@@ -1,9 +1,9 @@
-name: release-tag
+name: releases
 
 on:
   push:
-    tags:
-      - v*
+    branches:
+      - releases
 
 
 jobs:
