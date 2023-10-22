@@ -34,7 +34,7 @@ jobs:
         run:  wasm-pack build --release --target web --out-dir www/pkg/ --verbose
 
       - name: Bundle
-        run: sudo rm -rf www/*.bin && cp port1/www/tokenizer.bin port1_tokenizer.bin && cp port2/www/tokenizer.bin port2_tokenizer.bin && cp port3/www/tokenizer.bin port3_tokenizer.bin && cp port4/www/tokenizer.bin port4_tokenizer.bin && cp port5/www/tokenizer.bin port5_tokenizer.bin && cp port6/www/tokenizer.bin port6_tokenizer.bin &&  tar -zcvf www.tar.gz www
+        run: sudo rm -rf www/*.bin && cp port1/www/tokenizer.bin www/port1_tokenizer.bin && cp port2/www/tokenizer.bin  www/port2_tokenizer.bin && cp port3/www/tokenizer.bin  www/port3_tokenizer.bin && cp port4/www/tokenizer.bin  www/port4_tokenizer.bin && cp port5/www/tokenizer.bin  www/port5_tokenizer.bin && cp port6/www/tokenizer.bin  www/port6_tokenizer.bin &&  tar -zcvf www.tar.gz www
         
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
