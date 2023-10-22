@@ -1,0 +1,39 @@
+[package]
+name = "port5"
+version = "0.1.0"
+edition = "2021"
+description = "Simple inference for the llama2 model and friends."
+
+[dependencies]
+byteorder = "1.4.3"
+ndarray = { version = "0.15.6", features = ["rayon"] }
+num-derive = "0.4.0"
+num-traits = "0.2.15"
+rand = "0.8.5"
+
+wasm-bindgen = "0.2"
+web-sys = {version="0.3.64",features=["Window","Performance","Navigator"]}
+console_log = {version="1.0.0",features=["color","wasm-bindgen"]}
+console_error_panic_hook = "0.1.7"
+log = "0.4.19"
+js-sys = "0.3.64"
+
+[dependencies.getrandom]
+version = "0.2.10"
+features = ["js"]
+
+
+[profile.release]
+opt-level = 3
+debug = false
+panic = "abort"
+debug-assertions = false
+overflow-checks = false
+lto = true
+incremental = false
+
+
+[lib]
+name = "port5"
+path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]

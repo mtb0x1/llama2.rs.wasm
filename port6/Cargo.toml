@@ -1,0 +1,43 @@
+[package]
+name = "port6"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+clap = { version = "4.0", features = ["derive"] }
+rand = "0.8.5"
+rayon = "1.7.0"
+num_cpus = "1.16.0"
+crabml = { git = "https://github.com/flaneur2020/crabml.git", commit = "910c4c6" }
+
+
+wasm-bindgen = "0.2"
+web-sys = {version="0.3.64",features=["Window","Performance","Navigator"]}
+console_log = {version="1.0.0",features=["color","wasm-bindgen"]}
+console_error_panic_hook = "0.1.7"
+log = "0.4.19"
+js-sys = "0.3.64"
+
+
+[dev-dependencies]
+pretty_assertions = "1.2.1"
+
+[dependencies.getrandom]
+version = "0.2.10"
+features = ["js"]
+
+
+[profile.release]
+opt-level = 3
+debug = false
+panic = "abort"
+debug-assertions = false
+overflow-checks = false
+lto = true
+incremental = false
+
+
+[lib]
+name = "port6"
+path = "src/lib.rs"
+crate-type = ["cdylib", "rlib"]
