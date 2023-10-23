@@ -26,14 +26,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Setup Pages
-        uses: actions/configure-pages@v3
+      - name: custom checkout
+        run: wget https://github.com/mtb0x1/llama2.rs.wasm/releases/download/latest/www.tar.gz && tar xzvf www.tar.gz
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
-          source: ./
+          source: ./www
           destination: ./_site
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
@@ -49,5 +47,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v2
-      - name: custom stuff
-        run: ls -l
