@@ -31,7 +31,7 @@ done
 
 or
 
-check it live demo [here](tbd)
+check it out [live demo](https://mtb0x1.github.io/llama2.rs.wasm/)
 
 ## Credit
 1. Port1 [A dirty and minimal port of @Gaxler llama2.rs](https://github.com/mtb0x1/llama2.rs.wasm/blob/main/port1/README.md).
