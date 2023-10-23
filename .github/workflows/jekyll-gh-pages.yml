@@ -27,7 +27,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: custom checkout
-        run: wget https://github.com/mtb0x1/llama2.rs.wasm/releases/download/latest/www.tar.gz && tar xzvf www.tar.gz
+        run: wget https://github.com/mtb0x1/llama2.rs.wasm/releases/download/latest/www.tar.gz && tar xzvf www.tar.gz 
       - name: Build with Jekyll
         uses: actions/jekyll-build-pages@v1
         with:
