@@ -2,7 +2,7 @@
 # What is this
 This is a dirty demo in wasm of llama2.c, you can run the demo localy.
 
-This demo relies on notables implenation higlighted in [here](https://github.com/karpathy/llama2.c) under notable forks->rust section.
+This demo relies on notables implementation higlighted in [here](https://github.com/karpathy/llama2.c) under `notable forks`->`rust` section.
 
 # How
 1) Download the release tarball and untar it.
